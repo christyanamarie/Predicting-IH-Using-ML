@@ -1,4 +1,4 @@
-#IH Code
+#Code for Predicting the Outcome of Ischemic Hepatitis with Real Patient Data Using Machine Learning Tools
 
 #LIBRARIES----------------------------------------------------------------------
 #libraries needed for functions used
@@ -231,4 +231,3 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
-
