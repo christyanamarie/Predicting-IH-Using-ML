@@ -5,6 +5,7 @@
 library(readxl) #read_excel
 library(caret) #createDataPartion, confusionMatrix
 library(tree) #tree
+library(randomForest) #randomForest
 library(BART) #pbart
 library(neuralnet) #neuralnet
 library(smotefamily) #SMOTE
@@ -252,6 +253,7 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
 
 
