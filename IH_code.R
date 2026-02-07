@@ -21,9 +21,13 @@ AST.ALT <- data$AST_Peak/data$ALT_Peak
 vars <- data.frame(AST.ALT, data$Blrb_Peak, data$Crtn_Peak, data$INR_Peak)
 
 #SCALE--------------------------------------------------------------------------
-data.scaled <- as.data.frame(lapply(data[,1:5], scale)) #normalize predictors
+data.scaled <- as.data.frame(lapply(vars, scale)) #normalize predictors
+
 df <- cbind(data.scaled, data[,6]) #combine normalized vars with response var
-colnames(df)[6] <-  "Outcome" #name response variable
+colnames(df)[5] <-  "Outcome" #name response variable
+colnames(df)[4] <-  "INR.Peak"
+colnames(df)[3] <-  "Crtn.Peak"
+colnames(df)[2] <-  "Blrb.Peak"
 
 
 #SUBSETS------------------------------------------------------------------------
@@ -235,4 +239,5 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
