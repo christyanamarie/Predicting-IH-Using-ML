@@ -74,6 +74,20 @@ confusionMatrix(data=factor(yhat.tree), reference=factor(y.test)) #eval metrics
 roc.tree <- roc(y.test, prob.tree, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
 
 
+#RANDOM FOREST------------------------------------------------------------------
+#set.seed(1)
+rf <- randomForest(factor(Outcome)~., data=train, ntree=1000, mtry=3) #baseline RF
+
+pred.rf <- predict(rf, newdata=test, type="prob")
+prob.rf <- pred.rf[,2] #probability of 1 (survival)
+yhat.rf <- round(prob.rf)
+
+rf$importance #variable importance
+
+confusionMatrix(data=factor(yhat.rf), reference=factor(test$Outcome))
+roc.rf <- roc(test$Outcome, prob.rf, plot=TRUE, print.auc=TRUE, print.auc.y=0.15)
+
+
 #BART---------------------------------------------------------------------------
 x.train <- train[, 1:4] #train set predictors
 y.train <- train$Outcome #train set response
@@ -238,6 +252,7 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
 
 
