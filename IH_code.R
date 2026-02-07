@@ -93,9 +93,9 @@ roc.bart <- roc(y.test, prob.bart, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) 
 
 
 #NEURAL NETWORK-----------------------------------------------------------------
-set.seed(5)
-nn <- neuralnet(Outcome~Crtn_Peak+INR_Peak+ALT_Peak+AST_Peak+Blrb_Peak,
-                data=train, hidden=c(3,3,3), rep=3, linear.output=FALSE, threshold=0.001)
+#set.seed(1)
+nn <- neuralnet(Outcome~AST.ALT+Blrb.Peak+Crtn.Peak+INR.Peak,
+                data=train, hidden=3, rep=3, linear.output=FALSE, threshold=0.001)
 plot(nn, rep="best") #model
 
 prob.nn <- predict(nn, newdata=test) #probability of test set outcome
@@ -238,6 +238,7 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
 
 
