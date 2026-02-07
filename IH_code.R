@@ -75,11 +75,11 @@ roc.tree <- roc(y.test, prob.tree, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) 
 
 
 #BART---------------------------------------------------------------------------
-x.train <- train[, 1:5] #train set predictors
+x.train <- train[, 1:4] #train set predictors
 y.train <- train$Outcome #train set response
-x.test <- test[, 1:5] #test set predict
+x.test <- test[, 1:4] #test set predict
 
-set.seed(1)
+#set.seed(1)
 bart.fit <- pbart(x.train, y.train, x.test) #model
 
 prob.bart <- bart.fit$prob.test.mean #probability of test set outcome
@@ -238,6 +238,7 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
 
 
