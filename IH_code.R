@@ -43,7 +43,6 @@ y.test <- test$Outcome #test set response
 full.model <- glm(Outcome~., data=train, family="binomial") #full logistic model
 summary(full.model) 
 
-set.seed(1)
 null.model <- glm(Outcome~1, data=train, family="binomial") #empty logistic model
 logreg <- step(null.model, scope=list(upper=full.model), direction="both", test="Chisq", trace=F) #model selection
 summary(logreg) #stepwise model
@@ -239,6 +238,7 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
 
 
