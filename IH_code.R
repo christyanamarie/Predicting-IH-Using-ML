@@ -32,7 +32,7 @@ colnames(df)[2] <-  "Blrb.Peak"
 
 #SUBSETS------------------------------------------------------------------------
 set.seed(1)
-index <- createDataPartition(unlist(df[,6]), p=0.8, list=FALSE, times=1)
+index <- createDataPartition(unlist(df[,5]), p=0.8, list=FALSE, times=1)
 train <- df[index,] #training set (80%)
 test <- df[-index,] #testing set (20% validation)
 
@@ -239,5 +239,6 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
 
