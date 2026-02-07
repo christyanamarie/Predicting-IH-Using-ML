@@ -15,6 +15,10 @@ library(ggplot2) #ggplot
 #DATA---------------------------------------------------------------------------
 data <- read_excel("IH_cleaned_data.xlsx") #read in data file
 
+#AST/ALT------------------------------------------------------------------------
+r <- cor(data$ALT_Peak, data$AST_Peak) #correlation coefficient between ALT & AST
+AST.ALT <- data$AST_Peak/data$ALT_Peak
+vars <- data.frame(AST.ALT, data$Blrb_Peak, data$Crtn_Peak, data$INR_Peak)
 
 #SCALE--------------------------------------------------------------------------
 data.scaled <- as.data.frame(lapply(data[,1:5], scale)) #normalize predictors
@@ -231,3 +235,4 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
