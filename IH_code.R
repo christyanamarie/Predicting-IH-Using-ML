@@ -59,11 +59,11 @@ full.tree <- tree(Outcome~., data=train) #full regression tree
 plot(full.tree) #plot full regression tree
 text(full.tree, pretty=0) #add labels to plot
 
-set.seed(13)
+#set.seed(1)
 cv <- cv.tree(full.tree, K=5) #5-fold cross-validation
 plot(cv$size, cv$dev, type='b') #determine "best" number of nodes for pruning (want: min)
 
-tree <- prune.tree(full.tree, best=6) #pruned regression tree
+tree <- prune.tree(full.tree, best=3) #pruned regression tree
 plot(tree) #plot pruned regression tree shape
 text(tree, pretty=0) #add labels to plot
 
@@ -238,6 +238,7 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
 
 
