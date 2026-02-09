@@ -182,19 +182,19 @@ smote.full.tree <- tree(Outcome~., data=smote.train) #full regression tree
 plot(smote.full.tree) #plot full regression tree
 text(smote.full.tree, pretty=0) #add labels to plot
 
-set.seed(5)
+#set.seed(1)
 cv <- cv.tree(smote.full.tree, K=5) #5-fold cross-validation
 plot(cv$size, cv$dev, type='b') #determine "best" number of nodes for pruning (want: min)
 
-smote.tree <- prune.tree(smote.full.tree, best=5) #pruned regression tree
+smote.tree <- prune.tree(smote.full.tree, best=6) #pruned regression tree
 plot(smote.tree) #plot pruned regression tree
 text(smote.tree, pretty=0) #add labels to plot
 
-smote.prob.tree <- predict(smote.tree, newdata=smote.test) #probability of test set outcome
+smote.prob.tree <- predict(smote.tree, newdata=test) #probability of test set outcome
 smote.yhat.tree <- round(smote.prob.tree) #prediction of test set outcome
 
-confusionMatrix(data=factor(smote.yhat.tree), reference=factor(smote.y.test)) #eval metrics
-smote.roc.tree <- roc(smote.y.test, smote.prob.tree, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
+confusionMatrix(data=factor(smote.yhat.tree), reference=factor(y.test)) #eval metrics
+smote.roc.tree <- roc(y.test, smote.prob.tree, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
 
 
 #SMOTE BART---------------------------------------------------------------------
@@ -236,6 +236,7 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
 
 
