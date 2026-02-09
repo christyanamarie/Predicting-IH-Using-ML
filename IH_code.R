@@ -229,16 +229,16 @@ smote.roc.bart <- roc(y.test, smote.prob.bart, plot=TRUE, print.auc=TRUE, print.
 
 
 #SMOTE NEURAL NETWORK-----------------------------------------------------------
-set.seed(5)
-smote.nn <- neuralnet(formula=Outcome~Crtn_Peak+INR_Peak+ALT_Peak+AST_Peak+Blrb_Peak,
-                      data=smote.train, hidden=c(5,1), rep=3, linear.output=FALSE, threshold=0.001)
+#set.seed(1)
+smote.nn <- neuralnet(formula=Outcome~AST.ALT+Blrb.Peak+Crtn.Peak+INR.Peak,
+                      data=smote.train, hidden=3, rep=3, linear.output=FALSE, threshold=0.001)
 plot(smote.nn, rep="best") #model
 
-smote.prob.nn <- predict(smote.nn, newdata=smote.test) #probability of test set outcome
+smote.prob.nn <- predict(smote.nn, newdata=test) #probability of test set outcome
 smote.yhat.nn <- round(smote.prob.nn) #prediction of test set outcome
 
-confusionMatrix(data=factor(smote.yhat.nn), reference=factor(smote.y.test)) #eval metrics
-smote.roc.nn <- roc(smote.y.test, smote.prob.nn, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
+confusionMatrix(data=factor(smote.yhat.nn), reference=factor(y.test)) #eval metrics
+smote.roc.nn <- roc(y.test, smote.prob.nn, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
 
 
 #SMOTE ROC CURVES---------------------------------------------------------------
@@ -249,6 +249,7 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
 
 
