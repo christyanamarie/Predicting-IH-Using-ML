@@ -166,16 +166,15 @@ ggplot(smote.train, aes(x=Blrb.Peak, y=Crtn.Peak, color=factor(Outcome))) +
 smote.full.model <- glm(Outcome~., data=smote.train, family="binomial") #full logistic model
 summary(smote.full.model)
 
-set.seed(1)
 smote.null.model <- glm(Outcome~1, data=smote.train, family="binomial") #empty logistic model
 smote.logreg <- step(smote.null.model, scope=list(upper=smote.full.model), direction="both", test="Chisq", trace=F) #model selection
 summary(smote.logreg) #stepwise model
 
-smote.prob.logreg <- predict(smote.logreg, newdata=smote.test, type="response") #probability of test set response
+smote.prob.logreg <- predict(smote.logreg, newdata=test, type="response") #probability of test set response
 smote.yhat.logreg <- round(smote.prob.logreg) #prediction of test set response
 
-confusionMatrix(factor(smote.yhat.logreg), factor(smote.y.test)) #eval metrics
-smote.roc.logreg <- roc(smote.y.test, smote.prob.logreg, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
+confusionMatrix(factor(smote.yhat.logreg), factor(y.test)) #eval metrics
+smote.roc.logreg <- roc(y.test, smote.prob.logreg, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
 
 
 #SMOTE REGRESSION TREE----------------------------------------------------------
@@ -237,6 +236,7 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
 
 
