@@ -211,12 +211,12 @@ smote.roc.rf <- roc(y.test, smote.prob.rf, plot=TRUE, print.auc=TRUE, print.auc.
 
 
 #SMOTE BART---------------------------------------------------------------------
-smote.x.train <- smote.train[, 1:5] #train set predictors
+smote.x.train <- smote.train[, 1:4] #train set predictors
 smote.y.train <- smote.train$Outcome #train set response
-smote.x.test <- smote.test[, 1:5] #test set predict
+x.test <- test[, 1:4] #test set predict
 
-set.seed(1)
-smote.bart.fit <- pbart(smote.x.train, smote.y.train, smote.x.test) #model
+#set.seed(1)
+smote.bart.fit <- pbart(smote.x.train, smote.y.train, x.test) #model
 
 smote.prob.bart <- smote.bart.fit$prob.test.mean #probability of test set outcome
 smote.yhat.bart <- round(smote.prob.bart) #prediction of test set outcome
@@ -224,8 +224,8 @@ smote.yhat.bart <- round(smote.prob.bart) #prediction of test set outcome
 smote.order <- order(smote.bart.fit$varcount.mean, decreasing=T) #avg variable count in decreasing order
 smote.bart.fit$varcount.mean[smote.order] #variable importance
 
-confusionMatrix(data=factor(smote.yhat.bart), reference=factor(smote.y.test)) #eval metrics
-smote.roc.bart <- roc(smote.y.test, smote.prob.bart, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
+confusionMatrix(data=factor(smote.yhat.bart), reference=factor(y.test)) #eval metrics
+smote.roc.bart <- roc(y.test, smote.prob.bart, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
 
 
 #SMOTE NEURAL NETWORK-----------------------------------------------------------
@@ -249,6 +249,7 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
 
 
