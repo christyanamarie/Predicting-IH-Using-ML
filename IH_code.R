@@ -132,51 +132,34 @@ legend("bottomright", inset=0.025, cex=1.5, text.font=6,
 
 
 #SMOTE--------------------------------------------------------------------------
-prop.table(table(data$Outcome)) #original response proportion
+prop.table(table(train$Outcome)) #original response proportion of training set
 
-n1 <- table(data$Outcome)['1'] #number of "1" responses
-n0 <- table(data$Outcome)['0'] #number of "0" responses
+n1 <- table(train$Outcome)['1'] #number of "1" responses
+n0 <- table(train$Outcome)['0'] #number of "0" responses
 r0 <- 0.50 #ideal proportion of responses
 ntimes <- ((1-r0)/r0)*(n1/n0)-1 #formula
 
-data[7] <- 1:length(data$Outcome) #add index to original data
-colnames(data)[7] <-  "Index" #name index for original data
+train[6] <- 1:length(train$Outcome) #add index to original train data
+colnames(train)[6] <-  "Index" #name index for original train data
 
-set.seed(1)
-SMOTE <- SMOTE(X=data, target=data$Outcome, K=5, dup_size=ntimes) #apply algorithm
+#set.seed(1)
+SMOTE <- SMOTE(X=train, target=train$Outcome, K=5, dup_size=ntimes) #apply algorithm
 SMOTE.DATA <- SMOTE$data #new dataset
-SMOTE.data <- SMOTE.DATA[,-8] #remove duplicated class
+SMOTE.data <- SMOTE.DATA[,-7] #remove duplicated class
   #order by original data index to easily identify synthetic observations  
-  SMOTE.data <- SMOTE.data[order(unlist(SMOTE.data[,7])),] 
-smote.data <- SMOTE.data[,-7] #remove index for completeness
+  SMOTE.data <- SMOTE.data[order(unlist(SMOTE.data[,6])),] 
+smote.train <- SMOTE.data[,-6] #remove index for completeness
 
-prop.table(table(smote.data$Outcome)) #SMOTE response proportion
+prop.table(table(smote.train$Outcome)) #SMOTE response proportion
 
 #plot data responses
-ggplot(data, aes(x=ALT_Peak, y=AST_Peak, color=factor(Outcome))) +
-  geom_point() + scale_color_manual(values=c('#98C1F1','#F9AE9F')) +
+ggplot(train, aes(x=Blrb.Peak, y=Crtn.Peak, color=factor(Outcome))) +
+  geom_point() + scale_color_manual(values=c('#F9AE9F','#98C1F1')) +
   ggtitle("Data") +  theme(plot.title=element_text(hjust=0.5))
 #plot SMOTE data responses (can see increase in minority "0")
-ggplot(smote.data, aes(x=ALT_Peak, y=AST_Peak, color=factor(Outcome))) +
-  geom_point() +scale_color_manual(values=c('#98C1F1','#F9AE9F')) +
+ggplot(smote.train, aes(x=Blrb.Peak, y=Crtn.Peak, color=factor(Outcome))) +
+  geom_point() +scale_color_manual(values=c('#F9AE9F','#98C1F1')) +
   ggtitle("SMOTE Data") +  theme(plot.title=element_text(hjust=0.5))
-
-r <- cor(data$ALT_Peak, data$AST_Peak) #correlation coefficient between ALT & AST
-
-
-#SMOTE SCALE--------------------------------------------------------------------
-smote.data.scaled <- as.data.frame(lapply(smote.data[,1:5], scale)) #normalize predictors
-smote.df <- cbind(smote.data.scaled, smote.data[,6]) #combine normalized vars with response var
-colnames(smote.df)[6] <- "Outcome" #name response variable
-
-
-#SMOTE SUBSETS------------------------------------------------------------------
-set.seed(1)
-smote.index <- createDataPartition(unlist(smote.df[,6]), p=0.8, list=FALSE, times=1)
-smote.train <- smote.df[smote.index,] #training set (80%)
-smote.test <- smote.df[-smote.index,] #testing set (20% validation)
-
-smote.y.test <- smote.test$Outcome #test set response
 
 
 #SMOTE LOGISTIC REGRESSION------------------------------------------------------
@@ -254,6 +237,7 @@ plot(smote.roc.nn, col="#98C1F1", lty=1, lwd=5, add=TRUE)
 legend("bottomright", cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1"), lty=(1), lwd=(5))
+
 
 
 
