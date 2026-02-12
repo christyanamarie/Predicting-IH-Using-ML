@@ -16,17 +16,16 @@ library(ggplot2) #ggplot
 #DATA---------------------------------------------------------------------------
 data <- read_excel("IH_cleaned_data.xlsx") #read in data file
 
-#rename variables
-colnames(data)[1] <- "Crtn.Peak"
-colnames(data)[2] <- "INR.Peak"
-colnames(data)[5] <- "Blrb.Peak"
-
 
 #AST/ALT------------------------------------------------------------------------
 r <- cor(data$ALT_Peak, data$AST_Peak) #correlation coefficient between ALT & AST
 AST.ALT <- data$AST_Peak/data$ALT_Peak #make AST/ALT ratio variable
 
-vars <- data.frame(AST.ALT, data$Blrb.Peak, data$Crtn.Peak, data$INR.Peak, data$Outcome)
+vars <- data.frame(AST.ALT, data$Blrb_Peak, data$Crtn_Peak, data$INR_Peak, data$Outcome)
+colnames(vars)[2] <- "Crtn.Peak"
+colnames(vars)[3] <- "INR.Peak"
+colnames(vars)[4] <- "Blrb.Peak"
+colnames(vars)[5] <- "Outcome"
 
 
 #SUBSETS------------------------------------------------------------------------
@@ -43,7 +42,6 @@ train.scaled <- as.data.frame(lapply(train.df[,-5], scale)) #normalize training 
 train <- cbind(train.scaled, train.df[,5]) #combine normalized training vars with response var
 
 colnames(train)[5] <- "Outcome"
-
 
 
 #LOGISTIC REGRESSION------------------------------------------------------------
@@ -256,6 +254,7 @@ plot(smote.roc.nn, col="gray", lty=1, lwd=5, add=TRUE)
 legend("bottomright", inset=0.025, cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "Random Forest", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1","gray"), lty=(1), lwd=(5))
+
 
 
 
