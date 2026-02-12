@@ -16,28 +16,33 @@ library(ggplot2) #ggplot
 #DATA---------------------------------------------------------------------------
 data <- read_excel("IH_cleaned_data.xlsx") #read in data file
 
+#rename variables
+colnames(data)[1] <- "Crtn.Peak"
+colnames(data)[2] <- "INR.Peak"
+colnames(data)[3] <- "ALT.Peak"
+colnames(data)[4] <- "AST.Peak"
+colnames(data)[5] <- "Blrb.Peak"
+
+
 #AST/ALT------------------------------------------------------------------------
 r <- cor(data$ALT_Peak, data$AST_Peak) #correlation coefficient between ALT & AST
-AST.ALT <- data$AST_Peak/data$ALT_Peak
-vars <- data.frame(AST.ALT, data$Blrb_Peak, data$Crtn_Peak, data$INR_Peak)
+AST.ALT <- data$AST_Peak/data$ALT_Peak #make AST/ALT ratio variable
 
-#SCALE--------------------------------------------------------------------------
-data.scaled <- as.data.frame(lapply(vars, scale)) #normalize predictors
-
-df <- cbind(data.scaled, data[,6]) #combine normalized vars with response var
-colnames(df)[5] <-  "Outcome" #name response variable
-colnames(df)[4] <-  "INR.Peak"
-colnames(df)[3] <-  "Crtn.Peak"
-colnames(df)[2] <-  "Blrb.Peak"
+vars <- data.frame(AST.ALT, data$Blrb.Peak, data$Crtn.Peak, data$INR.Peak, data$Outcome)
 
 
 #SUBSETS------------------------------------------------------------------------
 set.seed(1)
-index <- createDataPartition(unlist(df[,5]), p=0.8, list=FALSE, times=1)
-train <- df[index,] #training set (80%)
-test <- df[-index,] #testing set (20% validation)
+index <- createDataPartition(unlist(vars[,5]), p=0.8, list=FALSE, times=1)
+train.df <- vars[index,] #training set (80%)
+test <- vars[-index,] #testing set (20% validation)
 
-y.test <- test$Outcome #test set response
+y.test <- test$data.Outcome #test set response
+
+
+#SCALE--------------------------------------------------------------------------
+train.scaled <- as.data.frame(lapply(train.df[,-5], scale)) #normalize training predictors
+train <- cbind(train.scaled, train.df[,5]) #combine normalized training vars with response var
 
 
 #LOGISTIC REGRESSION------------------------------------------------------------
@@ -250,6 +255,7 @@ plot(smote.roc.nn, col="gray", lty=1, lwd=5, add=TRUE)
 legend("bottomright", inset=0.025, cex=1.5, text.font=6, 
        legend=c("Logistic Regression", "Regression Tree", "Random Forest", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1","gray"), lty=(1), lwd=(5))
+
 
 
 
