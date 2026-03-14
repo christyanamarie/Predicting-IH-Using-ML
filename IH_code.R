@@ -9,7 +9,8 @@ library(randomForest) #randomForest
 library(BART) #pbart
 library(neuralnet) #neuralnet
 library(smotefamily) #SMOTE
-library(pROC) #roc
+library(pROC) #roc, coords, ci.coords, ci.auc
+library(ROCR) #prediction, performance
 library(ggplot2) #ggplot
 
 
