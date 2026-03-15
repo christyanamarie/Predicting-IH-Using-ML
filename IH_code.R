@@ -53,10 +53,24 @@ logreg <- step(null.model, scope=list(upper=full.model), direction="both", test=
 summary(logreg) #stepwise model
 
 prob.logreg <- predict(logreg, newdata=test, type="response") #probability of test set outcome
-yhat.logreg <- round(prob.logreg) #prediction of test set outcome
+yhat.logreg <- ifelse(prob.logreg >= 0.5, 1, 0) #prediction of test set outcome
 
-confusionMatrix(factor(yhat.logreg), factor(y.test)) #eval metrics
-roc.logreg <- roc(y.test, prob.logreg, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
+caret::confusionMatrix(data=factor(yhat.logreg, levels=c(0,1)), reference=factor(y.test, levels=c(0,1)), positive='1') #eval metrics
+roc.logreg <- pROC::roc(response=y.test, predictor=prob.logreg, levels=c(0,1), direction="<")
+  plot(roc.logreg) #ROC sensitivity vs specificity
+  print(roc.logreg) #AUC
+  ci.auc(roc.logreg) #AUC CI
+
+print(pROC::coords(roc.logreg, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity"), transpose=F)) #point metrics at threshold 0.5
+print(pROC::ci.coords(roc.logreg, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity"), transpose=F)) #point metrics CI
+
+#ROC fpr vs tpr
+logreg.pred <- ROCR::prediction(prob.logreg, y.test)
+logreg.roc <- ROCR::performance(logreg.pred, "tpr", "fpr")
+  logreg.auc <- ROCR::performance(logreg.pred, "auc")
+
+plot(logreg.roc) #ROC
+  print(logreg.auc@y.values[[1]]) #AUC
 
 
 #REGRESSION TREE----------------------------------------------------------------
