@@ -222,14 +222,27 @@ x.test <- test[, 1:4] #test set predict
 #set.seed(1)
 smote.bart.fit <- pbart(smote.x.train, smote.y.train, x.test) #model
 
-smote.prob.bart <- smote.bart.fit$prob.test.mean #probability of test set outcome
-smote.yhat.bart <- round(smote.prob.bart) #prediction of test set outcome
-
 smote.order <- order(smote.bart.fit$varcount.mean, decreasing=T) #avg variable count in decreasing order
 smote.bart.fit$varcount.mean[smote.order] #variable importance
 
-confusionMatrix(data=factor(smote.yhat.bart), reference=factor(y.test)) #eval metrics
-smote.roc.bart <- roc(y.test, smote.prob.bart, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
+smote.prob.bart <- smote.bart.fit$prob.test.mean #probability of test set outcome
+smote.yhat.bart <- ifelse(smote.prob.bart >= 0.5, 1, 0) #prediction of test set outcome
+
+caret::confusionMatrix(data=factor(smote.yhat.bart, levels=c(0,1)), reference=factor(y.test, levels=c(0,1)), positive='1') #eval metrics
+smote.roc.bart <- pROC::roc(response=y.test, predictor=smote.prob.bart, levels=c(0,1), direction="<")
+  plot(smote.roc.bart) #ROC specificity vs sensitivity
+  print(smote.roc.bart) #AUC
+  ci.auc(smote.roc.bart) #AUC CI
+
+print(pROC::coords(smote.roc.bart, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity", "auc"), transpose=F)) #point metrics at threshold 0.5
+print(pROC::ci.coords(smote.roc.bart, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity"), transpose=F)) #point metrics CI
+
+bart.pred.smote <- ROCR::prediction(smote.prob.bart, y.test)
+bart.roc.smote <- ROCR::performance(bart.pred.smote, "tpr", "fpr")
+  bart.auc.smote <- performance(bart.pred.smote, "auc")
+
+plot(bart.roc.smote) #ROC fpr vs tpr
+  print(bart.auc.smote@y.values[[1]]) #AUC
 
 
 #SMOTE NEURAL NETWORK-----------------------------------------------------------
