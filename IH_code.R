@@ -118,10 +118,23 @@ nn <- neuralnet(Outcome~AST.ALT+Blrb.Peak+Crtn.Peak+INR.Peak,
 plot(nn, rep="best") #model
 
 prob.nn <- predict(nn, newdata=test) #probability of test set outcome
-yhat.nn <- round(prob.nn) #prediction of test set outcome
+yhat.nn <- ifelse(prob.nn >= 0.5, 1, 0) #prediction of test set outcome
 
-confusionMatrix(data=factor(yhat.nn), reference=factor(y.test)) #eval metrics
-roc.nn <- roc(y.test, prob.nn, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
+caret::confusionMatrix(data=factor(yhat.nn, levels=c(0,1)), reference=factor(y.test, levels=c(0,1)), positive='1') #eval metrics
+roc.nn <- pROC::roc(response=y.test, predictor=prob.nn, levels=c(0,1), direction="<")
+  plot(roc.nn) #ROC sensitivity vs specificity
+  print(roc.nn) #AUC
+  ci.auc(roc.nn) #AUC CI
+
+print(pROC::coords(roc.nn, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity", "auc"), transpose=F)) #point metrics at threshold 0.5
+print(pROC::ci.coords(roc.nn, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity"), transpose=F)) #boostrap CIs at threshold 0.5
+
+nn.pred <- ROCR::prediction(prob.nn, y.test)
+nn.roc <- ROCR::performance(nn.pred, "tpr", "fpr")
+  nn.auc <- performance(nn.pred, "auc")
+
+plot(nn.roc) #ROC fpr vs tpr
+  print(nn.auc@y.values[[1]]) #AUC
 
 
 #ROC CURVES---------------------------------------------------------------------
