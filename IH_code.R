@@ -204,14 +204,27 @@ smote.roc.tree <- roc(y.test, smote.prob.tree, plot=TRUE, print.auc=TRUE, print.
 #SMOTE RANDOM FOREST------------------------------------------------------------
 smote.rf <- randomForest(factor(Outcome)~., data=smote.train, ntree=1000, mtry=3) #baseline RF
 
-smote.pred.rf <- predict(smote.rf, newdata=test, type="prob")
-smote.prob.rf <- smote.pred.rf[,2] #probability of 1 (survival)
-smote.yhat.rf <- round(smote.prob.rf)
-
 smote.rf$importance #variable importance
 
-confusionMatrix(data=factor(smote.yhat.rf), reference=factor(y.test))
-smote.roc.rf <- roc(y.test, smote.prob.rf, plot=TRUE, print.auc=TRUE, print.auc.y=0.15)
+smote.pred.rf <- predict(smote.rf, newdata=test, type="prob")
+smote.prob.rf <- smote.pred.rf[,2] #probability of 1 (survival)
+smote.yhat.rf <- ifelse(smote.prob.rf >= 0.5, 1, 0) #prediction of test set outcome
+
+caret::confusionMatrix(data=factor(smote.yhat.rf, levels=c(0,1)), reference=factor(y.test, levels=c(0,1)), positive='1') #eval metrics
+smote.roc.rf <- pROC::roc(response=y.test, predictor=smote.prob.rf, levels=c(0,1), direction="<")
+  plot(smote.roc.rf) #ROC specificity vs sensitivity
+  print(smote.roc.rf) #AUC
+  ci.auc(smote.roc.rf) #AUC CI
+
+print(pROC::coords(smote.roc.rf, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity", "auc"), transpose=F)) #point metrics at threshold 0.5
+print(pROC::ci.coords(smote.roc.rf, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity"), transpose=F)) #point metrics CI
+
+rf.pred.smote <- ROCR::prediction(smote.prob.rf, y.test)
+rf.roc.smote <- ROCR::performance(rf.pred.smote, "tpr", "fpr")
+  rf.auc.smote <- performance(rf.pred.smote, "auc")
+
+plot(rf.roc.smote) #ROC  fpr vs tpr
+  print(rf.auc.smote@y.values[[1]]) #AUC
 
 
 #SMOTE BART---------------------------------------------------------------------
