@@ -101,14 +101,27 @@ x.test <- test[, 1:4] #test set predict
 #set.seed(1)
 bart.fit <- pbart(x.train, y.train, x.test) #model
 
-prob.bart <- bart.fit$prob.test.mean #probability of test set outcome
-yhat.bart <- round(prob.bart) #prediction of test set outcome
-
 order <- order(bart.fit$varcount.mean, decreasing=T) #avg variable count in decreasing order
 bart.fit$varcount.mean[order] #variable importance
 
-confusionMatrix(data=factor(yhat.bart), reference=factor(y.test)) #eval metrics
-roc.bart <- roc(y.test, prob.bart, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
+prob.bart <- bart.fit$prob.test.mean #probability of test set outcome
+yhat.bart <- ifelse(prob.bart >= 0.5, 1, 0) #prediction of test set outcome
+
+caret::confusionMatrix(data=factor(yhat.bart, levels=c(0,1)), reference=factor(y.test, levels=c(0,1)), positive='1') #eval metrics
+roc.bart <- pROC::roc(response=y.test, predictor=prob.bart, levels=c(0,1), direction="<")
+  plot(roc.bart) #ROC sensitivity vs specificity
+  print(roc.bart) #AUC
+  ci.auc(roc.bart) #AUC CI
+
+print(pROC::coords(roc.bart, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity", "auc"), transpose=F)) #point metrics at threshold 0.5
+print(pROC::ci.coords(roc.bart, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity"), transpose=F)) #point metrics CI
+
+bart.pred <- ROCR::prediction(prob.bart, y.test)
+bart.roc <- ROCR::performance(bart.pred, "tpr", "fpr")
+  bart.auc <- performance(bart.pred, "auc")
+
+plot(bart.roc) #ROC fpr vs tpr
+  print(bart.auc@y.values[[1]]) #AUC
 
 
 #NEURAL NETWORK-----------------------------------------------------------------
