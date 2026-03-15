@@ -246,30 +246,13 @@ smote.roc.nn <- roc(y.test, smote.prob.nn, plot=TRUE, print.auc=TRUE, print.auc.
 
 
 #SMOTE ROC CURVES---------------------------------------------------------------
-plot(smote.roc.logreg, col="#F9AE9F", lty=1, lwd=5, family="serif", cex.lab=1.5, cex.axis=1.5)
-plot(smote.roc.tree, col="#FADF57", lty=1, lwd=5, add=TRUE)
-plot(smote.roc.rf, col="#AACD9D", lty=1, lwd=5, add=TRUE) 
-plot(smote.roc.bart, col="#98C1F1", lty=1, lwd=5, add=TRUE)
-plot(smote.roc.nn, col="gray", lty=1, lwd=5, add=TRUE) 
-legend("bottomright", inset=0.025, cex=1.5, text.font=6, 
+plot(logreg.roc.smote, col="#F9AE9F", lty=1, lwd=5, family="serif", cex.lab=1.3, cex.axis=1.5)
+plot(tree.roc.smote, col="#FADF57", lty=1, lwd=5, add=TRUE)
+plot(rf.roc.smote, col="#AACD9D", lty=1, lwd=5, add=TRUE)
+plot(bart.roc.smote, col="#98C1F1", lty=1, lwd=5, add=TRUE)
+plot(nn.roc.smote, col="gray", lty=1, lwd=5, add=TRUE)
+abline(0,1)
+legend("topleft", inset=0.025, cex=1.3, text.font=6,
        legend=c("Logistic Regression", "Regression Tree", "Random Forest", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1","gray"), lty=(1), lwd=(5))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
