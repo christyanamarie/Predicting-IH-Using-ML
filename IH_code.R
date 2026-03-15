@@ -85,12 +85,25 @@ rf <- randomForest(factor(Outcome)~., data=train, ntree=1000, mtry=3) #baseline 
 
 pred.rf <- predict(rf, newdata=test, type="prob")
 prob.rf <- pred.rf[,2] #probability of 1 (survival)
-yhat.rf <- round(prob.rf)
+yhat.rf <- ifelse(prob.rf >= 0.5, 1, 0) #prediction of test set outcome
 
 rf$importance #variable importance
 
-confusionMatrix(data=factor(yhat.rf), reference=factor(test$Outcome))
-roc.rf <- roc(test$Outcome, prob.rf, plot=TRUE, print.auc=TRUE, print.auc.y=0.15)
+caret::confusionMatrix(data=factor(yhat.rf, levels=c(0,1)), reference=factor(y.test, levels=c(0,1)), positive='1') #eval metrics
+roc.rf <- pROC::roc(response=y.test, predictor=prob.rf, levels=c(0,1), direction="<")
+  plot(roc.rf) #ROC sensitivity vs specificity
+  print(roc.rf) #AUC
+  ci.auc(roc.rf) #AUC CI
+
+print(pROC::coords(roc.rf, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity", "auc"), transpose=F)) #point metrics at threshold 0.5
+print(pROC::ci.coords(roc.rf, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity"), transpose=F)) #point metrics CI
+
+rf.pred <- ROCR::prediction(prob.rf, y.test)
+rf.roc <- ROCR::performance(rf.pred, "tpr", "fpr")
+  rf.auc <- performance(rf.pred, "auc")
+
+plot(rf.roc) #ROC #plot fpr vs tpr
+  print(rf.auc@y.values[[1]]) #AUC
 
 
 #BART---------------------------------------------------------------------------
