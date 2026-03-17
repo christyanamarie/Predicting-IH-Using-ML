@@ -358,10 +358,23 @@ smote.nn <- neuralnet(formula=Outcome~AST.ALT+Blrb.Peak+Crtn.Peak+INR.Peak,
 plot(smote.nn, rep="best") #model
 
 smote.prob.nn <- predict(smote.nn, newdata=test) #probability of test set outcome
-smote.yhat.nn <- round(smote.prob.nn) #prediction of test set outcome
+smote.yhat.nn <- ifelse(smote.prob.nn >= 0.5, 1, 0) #prediction of test set outcome
 
-confusionMatrix(data=factor(smote.yhat.nn), reference=factor(y.test)) #eval metrics
-smote.roc.nn <- roc(y.test, smote.prob.nn, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
+caret::confusionMatrix(data=factor(smote.yhat.nn, levels=c(0,1)), reference=factor(y.test, levels=c(0,1)), positive='1') #eval metrics
+smote.roc.nn <- pROC::roc(response=y.test, predictor=smote.prob.nn, levels=c(0,1), direction="<")
+  plot(smote.roc.nn) #ROC specificity vs sensitivity
+  print(smote.roc.nn) #AUC
+  ci.auc(smote.roc.nn) #AUC CI
+
+print(pROC::coords(smote.roc.nn, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity", "auc"), transpose=F)) #point metrics at threshold 0.5
+print(pROC::ci.coords(smote.roc.nn, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity"), transpose=F)) #point metrics CI
+
+nn.pred.smote <- ROCR::prediction(smote.prob.nn, y.test)
+nn.roc.smote <- ROCR::performance(nn.pred.smote, "tpr", "fpr")
+  nn.auc.smote <- performance(nn.pred.smote, "auc")
+
+plot(nn.roc.smote) #ROC fpr vs tpr
+  print(nn.auc.smote@y.values[[1]]) #AUC
 
 
 #SMOTE ROC CURVES---------------------------------------------------------------
