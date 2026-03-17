@@ -191,12 +191,13 @@ plot(nn.roc) #ROC fpr vs tpr
 
 
 #ROC CURVES---------------------------------------------------------------------
-plot(roc.logreg, col="#F9AE9F", lty=1, lwd=5, family="serif", cex.lab=1.5, cex.axis=1.5)
-plot(roc.tree, col="#FADF57", lty=1, lwd=5, add=TRUE)
-plot(roc.rf, col="#AACD9D", lty=1, lwd=5, add=TRUE)
-plot(roc.bart, col="#98C1F1", lty=1, lwd=5, add=TRUE)
-plot(roc.nn, col="gray", lty=1, lwd=5, add=TRUE)
-legend("bottomright", inset=0.025, cex=1.5, text.font=6,
+plot(logreg.roc, col="#F9AE9F", lty=1, lwd=5, family="serif", cex.lab=1.3, cex.axis=1.5)
+plot(tree.roc, col="#FADF57", lty=1, lwd=5, add=TRUE)
+plot(rf.roc, col="#AACD9D", lty=1, lwd=5, add=TRUE)
+plot(bart.roc, col="#98C1F1", lty=1, lwd=5, add=TRUE)
+plot(nn.roc, col="gray", lty=1, lwd=5, add=TRUE)
+abline(0,1)
+legend("topleft", inset=0.025, cex=1.3, text.font=6,
        legend=c("Logistic Regression", "Regression Tree", "Random Forest", "BART", "Neural Network"),
        col=c("#F9AE9F","#FADF57","#AACD9D","#98C1F1","gray"), lty=(1), lwd=(5))
 
