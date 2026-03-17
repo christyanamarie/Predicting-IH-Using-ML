@@ -88,11 +88,23 @@ plot(tree) #plot pruned regression tree shape
 text(tree, pretty=0) #add labels to plot
 
 prob.tree <- predict(tree, newdata=test) #probability of test set outcome
-yhat.tree <- round(prob.tree) #prediction of test set outcome
+yhat.tree <- ifelse(prob.tree >= 0.5, 1, 0) #prediction of test set outcome
 
-confusionMatrix(data=factor(yhat.tree), reference=factor(y.test)) #eval metrics
-roc.tree <- roc(y.test, prob.tree, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
+caret::confusionMatrix(data=factor(yhat.tree, levels=c(0,1)), reference=factor(y.test, levels=c(0,1)), positive='1') #eval metrics
+roc.tree <- pROC::roc(response=y.test, predictor=prob.tree, levels=c(0,1), direction="<")
+  plot(roc.tree) #ROC sensitivity vs specificity
+  print(roc.tree) #AUC
+  ci.auc(roc.tree) #AUC CI
 
+print(pROC::coords(roc.tree, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity", "auc"), transpose=F)) #point metrics at threshold 0.5
+print(pROC::ci.coords(roc.tree, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity"), transpose=F)) #point metrics CI
+
+tree.pred <- ROCR::prediction(prob.tree, y.test)
+tree.roc <- ROCR::performance(tree.pred, "tpr", "fpr")
+  tree.auc <- performance(tree.pred, "auc")
+
+plot(tree.roc) #ROC fpr vs tpr
+  print(tree.auc@y.values[[1]]) #AUC
 
 #RANDOM FOREST------------------------------------------------------------------
 #set.seed(1)
