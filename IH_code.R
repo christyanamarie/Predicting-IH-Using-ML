@@ -275,10 +275,23 @@ plot(smote.tree) #plot pruned regression tree
 text(smote.tree, pretty=0) #add labels to plot
 
 smote.prob.tree <- predict(smote.tree, newdata=test) #probability of test set outcome
-smote.yhat.tree <- round(smote.prob.tree) #prediction of test set outcome
+smote.yhat.tree <- ifelse(smote.prob.tree >= 0.5, 1, 0) #prediction of test set outcome
 
-confusionMatrix(data=factor(smote.yhat.tree), reference=factor(y.test)) #eval metrics
-smote.roc.tree <- roc(y.test, smote.prob.tree, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
+caret::confusionMatrix(data=factor(smote.yhat.tree, levels=c(0,1)), reference=factor(y.test, levels=c(0,1)), positive='1') #eval metrics
+smote.roc.tree <- pROC::roc(response=y.test, predictor=smote.prob.tree, levels=c(0,1), direction="<")
+  plot(smote.roc.tree) #ROC specificity vs sensitivity
+  print(smote.roc.tree) #AUC
+  ci.auc(smote.roc.tree) #AUC CI
+
+print(pROC::coords(smote.roc.tree, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity", "auc"), transpose=F)) #point metrics at threshold 0.5
+print(pROC::ci.coords(smote.roc.tree, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity"), transpose=F)) #point metrics CI
+
+tree.pred.smote <- ROCR::prediction(smote.prob.tree, y.test)
+tree.roc.smote <- ROCR::performance(tree.pred.smote, "tpr", "fpr")
+  tree.auc.smote <- performance(tree.pred.smote, "auc")
+
+plot(tree.roc.smote) #ROC fpr vs tpr
+  print(tree.auc.smote@y.values[[1]]) #AUC
 
 
 #SMOTE RANDOM FOREST------------------------------------------------------------
