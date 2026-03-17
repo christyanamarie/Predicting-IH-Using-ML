@@ -242,10 +242,23 @@ smote.logreg <- step(smote.null.model, scope=list(upper=smote.full.model), direc
 summary(smote.logreg) #stepwise model
 
 smote.prob.logreg <- predict(smote.logreg, newdata=test, type="response") #probability of test set response
-smote.yhat.logreg <- round(smote.prob.logreg) #prediction of test set response
+smote.yhat.logreg <- ifelse(smote.prob.logreg >= 0.5, 1, 0) #prediction of test set outcome
 
-confusionMatrix(factor(smote.yhat.logreg), factor(y.test)) #eval metrics
-smote.roc.logreg <- roc(y.test, smote.prob.logreg, plot=TRUE, print.auc=TRUE, print.auc.y=0.15) #ROC & AUC
+caret::confusionMatrix(data=factor(smote.yhat.logreg, levels=c(0,1)), reference=factor(y.test, levels=c(0,1)), positive='1') #eval metrics
+smote.roc.logreg <- pROC::roc(response=y.test, predictor=smote.prob.logreg, levels=c(0,1), direction="<")
+  plot(smote.roc.logreg) #ROC specificity vs sensitivity
+  print(smote.roc.logreg) #AUC
+  ci.auc(smote.roc.logreg) #AUC CI
+
+print(pROC::coords(smote.roc.logreg, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity"), transpose=F)) #point metrics at threshold 0.5
+print(pROC::ci.coords(smote.roc.logreg, x=0.5, input='threshold', ret=c("accuracy", "sensitivity", "specificity"), transpose=F)) #point metrics CI
+
+logreg.pred.smote <- ROCR::prediction(smote.prob.logreg, y.test)
+logreg.roc.smote <- ROCR::performance(logreg.pred.smote, "tpr", "fpr")
+  logreg.auc.smote <- ROCR::performance(logreg.pred.smote, "auc")
+
+plot(logreg.roc.smote) #ROC fpr vs tpr
+  print(logreg.auc.smote@y.values[[1]]) #AUC
 
 
 #SMOTE REGRESSION TREE----------------------------------------------------------
